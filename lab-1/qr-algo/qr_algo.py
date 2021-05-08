@@ -2,6 +2,7 @@ import numpy as np
 from math import sqrt, copysign
 from cmath import sqrt as comp_sqrt
 from functools import reduce
+import logging, json
 
 def norm(array):
     return sqrt(reduce(lambda x, n: x + n*n, array, 0))
@@ -100,6 +101,8 @@ def qr_algorithm(matrix, eps):
         Q, R = qr_decomposition(matrix)
         matrix = R @ Q
 
+    logging.debug("Reduced matrix:\n%s", str(matrix))
+
     col_i = 0
     values = np.zeros((matrix_size, ), dtype=np.complex64)
 
@@ -107,13 +110,16 @@ def qr_algorithm(matrix, eps):
         exists, val_1, val_2 = get_eigenval(matrix, col_i, eps)
         if exists:
             if np.iscomplex(val_1):
+                logging.debug("Complex values found: %s %s", str(val_1), str(val_2))
                 values[col_i] = val_1
                 values[col_i + 1] = val_2
                 col_i += 2
             else:
+                logging.debug("Real value found: %f", val_1)
                 values[col_i] = val_1
                 col_i += 1
         else:
+            logging.debug("No values found, improving...")
             Q, R = qr_decomposition(matrix)
             matrix = R @ Q
 
@@ -124,9 +130,26 @@ def qr_algorithm(matrix, eps):
 
 
 def main():
-    matrix = np.array([[ 9,  0,  2], 
-                       [-6,  4,  4], 
-                       [-2, -7,  5]])
+    logging.basicConfig(filename='qr.log', encoding='utf-8', level=logging.INFO)
+
+    with open("task.json", "r") as json_file:
+        task = json.load(json_file)
+
+    matrix = np.array(task["matrix"])
+    try:
+        eps = task["epsilon"]
+    except KeyError:
+        eps = 10e-5
+
+    logging.info("Input matrix:\n%s", str(matrix))
+    logging.info("Selected epsilon: %f", eps)
+
+    eigens = qr_algorithm(matrix, eps)
+
+    logging.info("Eigenvalues: %s", str(eigens))
+
+    print("Eigenvalues: ")
+    print(eigens)
 
 
 
