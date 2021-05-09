@@ -1,5 +1,6 @@
 import math
 import numpy as np
+import logging, json
 
 MAX_ITER = 1000
 
@@ -61,10 +62,25 @@ def jacobi_iteration(matrix, eps=10e-5):
 
 
 if __name__ == "__main__":
-    matrix = np.array([[-6,  6, -8],
-                       [ 6, -4,  9],
-                       [-8,  9, -2]])
+    logging.basicConfig(filename='jacobi.log', encoding='utf-8', level=logging.INFO)
+
+    with open("task.json", "r") as json_file:
+        task = json.load(json_file)
+
+    matrix = np.array(task["matrix"])
+    try:
+        eps = task["epsilon"]
+    except KeyError:
+        eps = 10e-5
+
+    logging.info("Input matrix:\n%s", str(matrix))
+    logging.info("Selected epsilon: %f", eps)
 
     values, vectors = jacobi_iteration(matrix)
-    print(values)
+
+    logging.info("Eigenvalues: %s", str(values))
+    logging.info("Eigenvectors:\n%s", str(vectors))
+
+    print("Eigenvalues: ", values)
+    print("Eigenvectors: ")
     print(vectors)
