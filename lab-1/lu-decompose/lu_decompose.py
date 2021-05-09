@@ -24,7 +24,7 @@ def decompose_matrix(matrix):
                 max_val = abs_val
                 max_i = i
 
-        if isclose(max_val, 0):
+        if isclose(max_val, 0, abs_tol=10e-5):
             raise RuntimeError("Recieved matrix is degenerate")
 
         if iter_i != max_i:
