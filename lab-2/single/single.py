@@ -23,6 +23,8 @@ def iteration_method(a, b, eps):
         # Depends on a function being monotone
         return max( abs(dphi(a)), abs(dphi(b)) )
 
+    logging.info("Iteration method")
+
     x = x_prev = (a + b) / 2
     q = get_max_change(a, b)
 
@@ -49,12 +51,46 @@ def iteration_method(a, b, eps):
 
     return x
 
+def newton_method(a, b, eps):
+    # All functions also depend on monotone
+    def get_max_change(a, b):
+        return max( abs(df(a)), abs(df(b)) )
+
+    def get_max_rate(a, b):
+        return max( abs(ddf(a)), abs(ddf(b)) )
+
+    logging.info("\nNewton method")
+
+    x = x_prev = (a + b) / 2
+    M = get_max_rate(a, b)
+    m = get_max_change(a, b)
+    c = M / (2 * m)
+
+    logging.info(f"Inital x = {x}, c = {c}")
+
+    iter_no = 0
+    while iter_no <= MAX_ITER:
+        iter_no += 1
+
+        x = x_prev - f(x_prev)/df(x_prev)
+
+        logging.info(f"Iteration {iter_no}: x = {x}")
+
+        error = (x - x_prev)**2 * c
+        if (error <= eps):
+            break
+
+        logging.info(f"{error} > {eps} , continue...")
+        x_prev = x
+
+    return x
 
 def main():
     logging.basicConfig(filename='single.log', encoding='utf-8', level=logging.INFO)
 
     a, b, eps = 0, 0.7, 0.01
-    print(iteration_method(a, b, eps))
+    print("Iteration method:", iteration_method(a, b, eps))
+    print("Newton method:", newton_method(a, b, eps))
     
 
 
