@@ -49,6 +49,8 @@ def iteration_method(a, b, eps):
     
     iter_no = 0
     while iter_no <= MAX_ITER:
+        iter_no += 1
+
         x = [func(x_prev) for func in phi]
 
         logging.info(f"Iteration {iter_no}: x0 = {x[0]}, x1 = {x[1]}")
