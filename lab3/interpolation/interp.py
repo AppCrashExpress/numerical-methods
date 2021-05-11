@@ -4,8 +4,12 @@ from math import sqrt
 def lagrange_interpolate(x, pivots):
     pivots.sort()
 
+    logging.info("Lagrange interpolation")
+    logging.info(f"Pivot points: {pivots}")
+
     for xn, xp in zip(pivots[1:], pivots[:-1]):
         if xn == xp:
+            logging.warning("Found two matching points on x-axis, cannot continue")
             return None
 
     y = 0
@@ -17,8 +21,11 @@ def lagrange_interpolate(x, pivots):
                 continue
             xj, _ = pivots[j]
             poly *= (x - xj) / (xi - xj)
+
+        logging.debug(f"Weight of point {i}: {poly}")
         
         y += poly
+        logging.info(f"y value after point {i}: {y}")
 
     return y
 
@@ -36,6 +43,9 @@ def newton_interpolate(x, pivots):
 
     pivots.sort()
 
+    logging.info("Newton interpolation")
+    logging.info(f"Pivot points: {pivots}")
+
     xs, ys = [list(t) for t in zip(*pivots)]
 
     div_diffs = [[None for _ in pivots] for _ in pivots]
@@ -43,16 +53,24 @@ def newton_interpolate(x, pivots):
         div_diffs[i][i] = ys[i]
     build_diffs(xs, div_diffs, 0, len(pivots) - 1)
 
+    logging.debug(f"Divided differences intervals:")
+    for i in range(len(pivots)):
+        for j in range(i, len(pivots)):
+            logging.debug(f"{i}, {j}: {div_diffs[i][j]}")
+
     y = 0
     for i in range(len(pivots)):
         coef = 1
         for j in range(i):
             coef *= x - xs[j]
         y += div_diffs[0][i] * coef
+        logging.info(f"y value after point {i}: {y}")
 
     return y
 
 def main():
+    logging.basicConfig(filename='interp.log', encoding='utf-8', level=logging.INFO)
+
     f = lambda x : sqrt(x)
     xs = [0, 1.7, 3.4, 5.1]
 
