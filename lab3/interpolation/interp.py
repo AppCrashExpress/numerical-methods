@@ -76,13 +76,14 @@ def main():
 
     points = list(map(lambda x : (x, f(x)), xs))
 
-    real_x = f(3)
-    lagrange_x = lagrange_interpolate(3, points)
-    newton_x = newton_interpolate(3, points)
+    x = 3
+    real_y = f(x)
+    lagrange_y = lagrange_interpolate(x, points)
+    newton_y = newton_interpolate(x, points)
 
-    print(real_x)
-    print(lagrange_x)
-    print(newton_x)
+    print("Real y value:         ", real_y)
+    print("y value from Lagrange:", lagrange_y)
+    print("y value from Newton:  ", newton_y)
 
 if __name__ == "__main__":
     main()
