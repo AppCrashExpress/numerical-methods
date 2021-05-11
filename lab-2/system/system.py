@@ -76,6 +76,7 @@ def iteration_method(a, b, eps):
         logging.info(f"{error} > {eps} , continue...")
         x_prev = x
 
+    logging.info(f"Method ended on iteration {iter_no} with x0 value of {x[0]}, x1 value of {x[1]}")
     return x
 
 def newton_method(a, b, eps):
@@ -115,6 +116,7 @@ def newton_method(a, b, eps):
         logging.info(f"{error} > {eps} , continue...")
         x_prev = x
 
+    logging.info(f"Method ended on iteration {iter_no} with x0 value of {x[0]}, x1 value of {x[1]}")
     return x
         
 
