@@ -1,4 +1,4 @@
-import logging, json
+import logging, argparse
 from math import sqrt, log
 
 MAX_ITER = 1000
@@ -88,9 +88,13 @@ def newton_method(a, b, eps):
     return x
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-e", "--eps", default=0.01, type=float)
+    args = parser.parse_args()
+
     logging.basicConfig(filename='single.log', encoding='utf-8', level=logging.INFO)
 
-    a, b, eps = 0, 0.7, 0.01
+    a, b, eps = 0, 0.7, args.eps
     print("Iteration method:", iteration_method(a, b, eps))
     print("Newton method:", newton_method(a, b, eps))
     

@@ -1,4 +1,4 @@
-import logging, json
+import logging, argparse
 import numpy as np
 from math import sqrt, exp, log
 from numpy.linalg import solve
@@ -122,11 +122,15 @@ def newton_method(a, b, eps):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-e", "--eps", default=0.01, type=float)
+    args = parser.parse_args()
+
     logging.basicConfig(filename='system.log', encoding='utf-8', level=logging.INFO)
 
     a = [0, 0]
     b = [0.7, 0.7]
-    eps = 0.01
+    eps = args.eps
     print("Iteration method:", iteration_method(a, b, eps))
     print("Newton method:", newton_method(a, b, eps))
     
