@@ -72,14 +72,17 @@ def main():
     logging.basicConfig(filename='interp.log', encoding='utf-8', level=logging.INFO)
 
     f = lambda x : sqrt(x)
-    xs = [0, 1.7, 3.4, 5.1]
 
-    points = list(map(lambda x : (x, f(x)), xs))
+    xs_a = [0, 1.7, 3.4, 5.1]
+    xs_b = [0, 1.7, 4.0, 5.1]
+
+    points_a = list(map(lambda x : (x, f(x)), xs_a))
+    points_b = list(map(lambda x : (x, f(x)), xs_b))
 
     x = 3
     real_y = f(x)
-    lagrange_y = lagrange_interpolate(x, points)
-    newton_y = newton_interpolate(x, points)
+    lagrange_y = lagrange_interpolate(x, points_a)
+    newton_y = newton_interpolate(x, points_b)
 
     print("Real y value:         ", real_y)
     print("y value from Lagrange:", lagrange_y)
