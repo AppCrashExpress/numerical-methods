@@ -26,3 +26,6 @@ def interpolate_point(x, poly):
         y = y * x + a
     return y
 
+def calculate_error(x, y, poly):
+    interp = interpolate_point(x, poly)
+    return np.sum((interp - y) ** 2)
