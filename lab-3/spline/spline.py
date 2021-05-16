@@ -1,5 +1,6 @@
 import logging
 import numpy as np
+from math import sqrt
 
 def make_splines(points_x, points_y):
     def get_diffs(x):
@@ -71,7 +72,10 @@ def interpolate(x, xs, coefs):
 def main():
     logging.basicConfig(filename='spline.log', encoding='utf-8', level=logging.INFO)
 
-    points = [(0,0), (1, 1.8415), (2,2.9093), (3,3.1411), (4,3.2432)]
+    f = lambda x : sqrt(x)
+    points = [(i * 1.7, f(i * 1.7)) for i in range(5)]
+    x = 3
+
     xs, ys = map(np.array, [list(t) for t in zip(*points)])
 
     logging.info(f"Point x: {xs}")
@@ -80,9 +84,11 @@ def main():
     coefs = make_splines(xs, ys)
     logging.info(f"Coefficient matrix:\n{coefs}")
 
+    real_y   = f(x)
     interp_y = interpolate(1.5, xs, coefs)
     logging.info(f"Interpolated y: {interp_y}")
-    print(interp_y)
+    print(f"For point {x} interpolated value is {interp_y}, when expected {f(x)}")
+    print(f"Error: {1 - min(interp_y, real_y) / max(interp_y, real_y)}")
 
 if __name__ == "__main__":
     main()
