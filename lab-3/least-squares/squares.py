@@ -26,10 +26,8 @@ def interpolate_point(x, poly):
     return y
 
 def main():
-    # f = lambda x : exp(x)
-    # points = [(i, f(i)) for i in range(5)]
-    f = lambda x : sqrt(x)
-    points = [(i * 1.7, f(i * 1.7)) for i in range(6)]
+    f = lambda x : exp(x)
+    points = [(i, f(i)) for i in range(5)]
 
     xs, ys = map(np.array, [list(t) for t in zip(*points)])
 
