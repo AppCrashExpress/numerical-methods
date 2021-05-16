@@ -1,3 +1,4 @@
+import logging
 import numpy as np
 
 def make_splines(points_x, points_y):
@@ -24,6 +25,9 @@ def make_splines(points_x, points_y):
     def get_c_coeffs(dx, y):
         matr = get_matrix(dx)
         consts = get_constants(dx, y)
+
+        logging.debug(f"Matrix:\n{matr}")
+        logging.debug(f"Constants:\n{consts}")
 
         return np.linalg.solve(matr, consts)
 
@@ -65,13 +69,20 @@ def interpolate(x, xs, coefs):
 
 
 def main():
-    points = [(0,0), (1, 1.8415), (2,2.9093), (3,3.1411), (4,3.2432)]
+    logging.basicConfig(filename='spline.log', encoding='utf-8', level=logging.INFO)
 
+    points = [(0,0), (1, 1.8415), (2,2.9093), (3,3.1411), (4,3.2432)]
     xs, ys = map(np.array, [list(t) for t in zip(*points)])
 
+    logging.info(f"Point x: {xs}")
+    logging.info(f"Point y: {ys}")
+
     coefs = make_splines(xs, ys)
-    print(coefs)
-    print(interpolate(1.5, xs, coefs))
+    logging.info(f"Coefficient matrix:\n{coefs}")
+
+    interp_y = interpolate(1.5, xs, coefs)
+    logging.info(f"Interpolated y: {interp_y}")
+    print(interp_y)
 
 if __name__ == "__main__":
     main()
