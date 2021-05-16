@@ -1,6 +1,6 @@
 import numpy as np
 
-def make_splines(points):
+def make_splines(points_x, points_y):
     def get_diffs(x):
         return np.diff(x)
 
@@ -23,7 +23,7 @@ def make_splines(points):
 
     def get_c_coeffs(dx, y):
         matr = get_matrix(dx)
-        consts = get_constants(dx, ys)
+        consts = get_constants(dx, y)
 
         return np.linalg.solve(matr, consts)
 
@@ -46,15 +46,32 @@ def make_splines(points):
 
         return coeffs
     
-    xs, ys = map(np.array, [list(t) for t in zip(*points)])
+    return get_coeffs(points_x, points_y)
 
-    print(get_coeffs(xs, ys))
+def interpolate(x, xs, coefs):
+    def find_interval(x, xs):
+        for i, x_i in enumerate(xs):
+            if x_i <= x:
+                return i
+        return None
+
+    i = find_interval(x, xs)
+    diff = x - xs[i]
+    y = 0
+    for coef in np.flip(coefs[i, :]):
+        y = y * diff + coef
+
+    return y
+
 
 def main():
     points = [(0,0), (1, 1.8415), (2,2.9093), (3,3.1411), (4,3.2432)]
 
-    make_splines(points)
+    xs, ys = map(np.array, [list(t) for t in zip(*points)])
 
+    coefs = make_splines(xs, ys)
+    print(coefs)
+    print(interpolate(1.5, xs, coefs))
 
 if __name__ == "__main__":
     main()
