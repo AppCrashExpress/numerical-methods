@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 from math import exp, sqrt
 
 np.set_printoptions(suppress=True)
@@ -25,14 +26,3 @@ def interpolate_point(x, poly):
         y = y * x + a
     return y
 
-def main():
-    f = lambda x : exp(x)
-    points = [(i, f(i)) for i in range(5)]
-
-    xs, ys = map(np.array, [list(t) for t in zip(*points)])
-
-    poly = calc_poly(xs, ys, 1)
-    print(interpolate_point(3.4, poly))
-
-if __name__ == "__main__":
-    main()
