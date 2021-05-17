@@ -58,7 +58,7 @@ def jacobi_iteration(matrix, eps=10e-5):
         
         iter += 1
         
-    return np.diag(matrix), vectors.T
+    return np.diag(matrix), vectors
 
 
 if __name__ == "__main__":
