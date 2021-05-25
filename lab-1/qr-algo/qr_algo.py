@@ -4,6 +4,8 @@ from cmath import sqrt as comp_sqrt
 from functools import reduce
 import logging, json
 
+np.set_printoptions(suppress=True)
+
 def norm(array):
     return sqrt(reduce(lambda x, n: x + n*n, array, 0))
 
@@ -134,11 +136,13 @@ def qr_algorithm(matrix, eps):
     if values[-1] == 0:
         values[-1] = matrix[-1, -1]
 
+    logging.debug(f"Resulting matrix:\n{matrix}")
+
     return values
 
 
 def main():
-    logging.basicConfig(filename='qr.log', encoding='utf-8', level=logging.INFO)
+    logging.basicConfig(filename='qr.log', encoding='utf-8', level=logging.DEBUG)
 
     with open("task.json", "r") as json_file:
         task = json.load(json_file)
@@ -149,10 +153,13 @@ def main():
     except KeyError:
         eps = 10e-5
 
+    print(np.linalg.det(matrix))
+
     logging.info("Input matrix:\n%s", str(matrix))
     logging.info("Selected epsilon: %f", eps)
 
     eigens = qr_algorithm(matrix, eps)
+    print(np.prod(eigens))
 
     logging.info("Eigenvalues: %s", str(eigens))
 

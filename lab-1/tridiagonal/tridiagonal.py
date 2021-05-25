@@ -1,3 +1,5 @@
+import json
+
 def check_tridiagonal(matrix):
     matrix_size = len(matrix)
     for i in range(matrix_size - 2):
@@ -69,8 +71,11 @@ def solve_tridiagonal(upper_diag, mid_diag, lower_diag, constraints):
     return result
 
 if __name__ == "__main__":
-    matrix = [[15, 8, 0, 0, 0], [2, -15, 4, 0, 0], [0, 4, 11, 5, 0], [0, 0, -3, 16, -7], [0, 0, 0, 3, 8]]
-    constraints = [92, -84, -77, 15, -11]
+    with open("task.json", "r") as json_file:
+        task = json.load(json_file)
+
+    matrix = task["matrix"]
+    constraints = task["constraints"]
 
     res = solve_tridiagonal(*get_diagonals(matrix), constraints)
     print(res)
