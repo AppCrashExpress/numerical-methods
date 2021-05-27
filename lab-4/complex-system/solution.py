@@ -1,14 +1,26 @@
 import numpy as np
 from collections import deque as Deque
 
-def f(x, y, dy):
+from tridiagonal import solve_tridiagonal
+
+def cauchy_f(x, y, dy):
     return (4*y - 4*x*dy) / (2*x + 1)
 
 def g(x, y, z):
     return z
 
+def p(x):
+    return 4 * x / (2 * x + 1)
+
+def q(x):
+    return -4 / (2 * x + 1)
+
+def f(x):
+    return 0
+
 def original_f(x):
     return x + np.exp(-2*x)
+
 
 def solve_runge(f, g, a, b, h, y0, dy0):
     xs = list(np.arange(a, b+h, h))
@@ -54,7 +66,8 @@ def df_num1(x, xs, ys, i = None):
 
     return (ys[i+1] - ys[i]) / (xs[i+1] - xs[i])
 
-def shooting_method(a, b, h, alpha, beta, delta, gamma, y0, y1, eps):
+def solve_shooting(f, g, a, b, h, alpha, beta, delta, gamma, y0, y1, eps):
+    # The spray-and-pray method
     def calc_phi(b, y1, delta, gamma, xs, ys):
         dy = df_num1(b, xs, ys)
         return delta*ys[-1] + gamma*dy - y1
@@ -78,12 +91,81 @@ def shooting_method(a, b, h, alpha, beta, delta, gamma, y0, y1, eps):
 
     return integ[-1]
 
+def solve_finite_diff(f, p, q, a, b, h, alpha, beta, delta, gamma, y0, y1):
+    xs = list(np.arange(a, b + h, h))
+    u = [beta] + [1 + p(x) * h/2 for x in xs[:-2]]
+    m = [alpha * h - beta] + [q(x) * h*h - 2 for x in xs[:-2]] \
+        + [delta * h + gamma]
+    l = [1 - p(x) * h/2 for x in xs[:-2]] + [-gamma]
+
+    c = [y0 * h] + [f(x) * h*h for x in xs[:-2]] + [y1 * h]
+    
+    ys = solve_tridiagonal(u, m, l, c)
+    return xs, ys
+
+def test_rrr(shooters, finits):
+    def get_error(l1, l2, order):
+        return [abs(i1 - i2) / (2**order - 1) for i1, i2 in zip(l1, l2)]
+    
+    return (
+        # 4th order? 1st order?
+        get_error(shooters[0], shooters[1], 4),
+        get_error(finits[0], finits[1], 1)
+    )
+
+def test_exact(shooter, finit, exact):
+    def get_error(l1, l2):
+        return [abs(i1 - i2) for i1, i2 in zip(l1, l2)]
+
+    return (
+        get_error(shooter, exact), 
+        get_error(finit, exact)
+    )
+    
 def main():
+    def print_pairwise(xs, ys):
+        for i, (x, y) in enumerate(zip(xs, ys)):
+            print(f"{i:2}: {x:.3f} {y}")
+    
     a, b, step = 0, 1, 0.1
     alpha, beta, delta, gamma = 0, 1, 2, 1
     y0, y1 = -1, 3
+    eps = 1e-5
     
-    print(shooting_method(a, b, step, alpha, beta, delta, gamma, y0, y1, 1e-5))
+    shooters = []
+    finits   = []
+
+    for h in [step, step/2]:
+        print("For step", h)
+
+        x, y = solve_shooting(cauchy_f, g, a, b, h, alpha, beta, delta, gamma, y0, y1, eps)
+        print("Shooting method:")
+        print_pairwise(x, y)
+        shooters.append(y)
+
+        x, y = solve_finite_diff(f, p, q, a, b, h, alpha, beta, delta, gamma, y0, y1)
+        print("Finite difference:")
+        print_pairwise(x, y)
+        finits.append(y)
+
+        print()
+
+    exact = [original_f(xi) for xi in x]
+    print("Analytical solution:")
+    print_pairwise(x, exact)
+
+    p_shooter, p_finit = test_rrr(shooters, finits)
+    print("\nPosterior errors:")
+    print(" Shooter method      Finite difference")
+    for i, (s, fin) in enumerate(zip(p_shooter, p_finit)):
+        print(f"{s:12.9f}  {fin:12.9f}")
+    
+    e_shooter, e_finit = test_exact(shooters[1], finits[1], exact)
+    print("\nExact errors:")
+    print(" Shooter method      Finite difference")
+    for i, (s, fin) in enumerate(zip(e_shooter, e_finit)):
+        print(f"{s:12.9f}        {fin:12.9f}")
+
 
 if __name__ == "__main__":
     main()
