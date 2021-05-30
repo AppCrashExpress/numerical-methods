@@ -1,5 +1,5 @@
 import numpy as np
-from math import sqrt, copysign
+from math import sqrt
 from cmath import sqrt as comp_sqrt
 from functools import reduce
 import logging, json
@@ -50,39 +50,47 @@ def test_second_eps(matrix, eps):
 
     return True
 
-def square_eigen(matrix):
-    if matrix.shape != (2, 2):
-        raise ValueError("Matrix should be square")
-
-    m = matrix
-
-    # a is 1
-    b = -m[0, 0] - m[1, 1]
-    c = m[0, 0] * m[1, 1] - m[1, 0] * m[0, 1]
-
-    d = b * b - 4 * c
-
-    if (d >= 0):
-        sqrt_d = sqrt(d)
-    else:
-        sqrt_d = comp_sqrt(d)
-
-    return ( (b + sqrt_d) / 2, (b - sqrt_d) / 2 )
 
 def get_eigenval(matrix, col_i, eps):
     def square_subarray(i):
         return matrix[i:i+2, i:i+2]
 
+    def check_complex(matrix):
+        if matrix.shape != (2, 2):
+            raise ValueError("Matrix should be square")
+
+        m = matrix
+
+        # a is 1
+        b = -m[0, 0] - m[1, 1]
+        c = m[0, 0] * m[1, 1] - m[1, 0] * m[0, 1]
+
+        d = b * b - 4 * c
+
+        return d < 0
+
+    def complex_eigen(matrix):
+        m = matrix
+
+        b = -m[0, 0] - m[1, 1]
+        c = m[0, 0] * m[1, 1] - m[1, 0] * m[0, 1]
+
+        d = b * b - 4 * c
+
+        sqrt_d = comp_sqrt(d)
+
+        return ( (b + sqrt_d) / 2, (b - sqrt_d) / 2 )
+
     if norm(abs(matrix[col_i+1:, col_i])) <= eps:
         return (True, matrix[col_i, col_i], 0)
 
-    elif norm(abs(matrix[col_i+2:, col_i])) <= eps:
-        prev_comp_0, prev_comp_1 = square_eigen(square_subarray(col_i))
+    elif check_complex(square_subarray(col_i)):
+        prev_comp_0, prev_comp_1 = complex_eigen(square_subarray(col_i))
         
         Q, R = qr_decomposition(matrix)
         matrix = R @ Q
 
-        comp_0, comp_1 = square_eigen(square_subarray(col_i))
+        comp_0, comp_1 = complex_eigen(square_subarray(col_i))
 
         close = [0, 0]
         close[0] = abs(comp_0 - prev_comp_0) <= eps
