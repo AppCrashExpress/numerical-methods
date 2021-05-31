@@ -11,7 +11,6 @@ def original_f(x):
     return (1 + x) * np.exp(x*x)
 
 def solve_euler(a, b, h, y0, dy0):
-    # Confusing.
     # The order of ODE is lowered with z = y', 
     # so both equations have to be solved:
     # z = z + h*f(x, y, z)
@@ -28,9 +27,6 @@ def solve_euler(a, b, h, y0, dy0):
     return xs, ys
 
 def solve_runge(a, b, h, y0, dy0):
-    # If formula is taken from the book,
-    # g and f have to be inverted since
-    # z = f(x, y, z)
     xs = list(np.arange(a, b+h, h))
     ys = []
     zs = []
