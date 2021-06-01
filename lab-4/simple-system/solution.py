@@ -56,7 +56,7 @@ def solve_runge(a, b, h, y0, dy0):
     
     return xs, ys, zs
 
-def solve_adam(xs, ys, zs, h):
+def solve_adams(xs, ys, zs, h):
     order = 4
     ys = ys[:order]
     zs = zs[:order]
@@ -89,14 +89,14 @@ def test_rrr(eulers, runges, adams):
     )
     
 
-def test_exact(euler, runge, adam, exact):
+def test_exact(euler, runge, adams, exact):
     def get_error(l1, l2):
         return [abs(i1 - i2) for i1, i2 in zip(l1, l2)]
     
     return (
         get_error(euler, exact), 
         get_error(runge, exact), 
-        get_error(adam, exact)
+        get_error(adams, exact)
     )
 
 def main():
@@ -113,19 +113,19 @@ def main():
     
     for h in [step, step/2]:
         print("For step", h)
-
+    
         x, y = solve_euler(a, b, h, y0, dy0)
         print("Euler:")
         print_pairwise(x, y)
         eulers.append(y)
-
+    
         x, y, z = solve_runge(a, b, h, y0, dy0)
         print("Runge:")
         print_pairwise(x, y)
         runges.append(y)
-
-        x, y = solve_adam(x, y, z, h)
-        print("Adam:")
+    
+        x, y = solve_adams(x, y, z, h)
+        print("Adams:")
         print_pairwise(x, y)
         adams.append(y)
         
@@ -137,13 +137,13 @@ def main():
     
     p_euler, p_runge, p_adam = test_rrr(eulers, runges, adams)
     print("\nPosterior errors:")
-    print(" Euler         Runge        Adam       ")
+    print(" Euler         Runge        Adams      ")
     for i, (e, r, a) in enumerate(zip(p_euler, p_runge, p_adam)):
         print(f"{e:12.9f}  {r:12.9f} {a:12.9f}")
     
     e_euler, e_runge, e_adam = test_exact(eulers[1], runges[1], adams[1], exact)
     print("\nExact errors:")
-    print(" Euler         Runge        Adam       ")
+    print(" Euler         Runge        Adams      ")
     for i, (e, r, a) in enumerate(zip(e_euler, e_runge, e_adam)):
         print(f"{e:12.9f}  {r:12.9f} {a:12.9f}")
 
